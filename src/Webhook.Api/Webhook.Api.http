@@ -4,3 +4,24 @@ GET {{Webhook.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+POST {{Webhook.Api_HostAddress}}/Orders/
+Content-Type: application/json
+
+{
+  "serviceId": "7d5fa1ef-5600-46c4-b35f-4ea2247130b1",
+  "amount": 10000,
+  "currency": "PLN",
+  "title": "title",
+  "orderId": "orderId",
+  "visibleMethod": ["imoje_paylater"],
+  "returnUrl": "https://domain.com/return",
+  "successReturnUrl": "https://domain.com/success",
+  "failureReturnUrl": "https://domain.com/failure",
+  "customer": {
+    "firstName": "Jan",
+    "lastName": "Kowalski",
+    "email": "jan.kowalski@example.com"
+  }
+}
+###
