@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Webhook.Infrastructure.Clients;
 
 namespace Webhook.Infrastructure;
 
@@ -8,8 +9,8 @@ public static class Extensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var section = configuration.GetSection("payment");
-        services.Configure<AppOptions>(section);
+        services.AddOptions<IMojeSettings>().Bind(configuration.GetSection(IMojeSettings.SectionName));
+        services.RegisterClient(configuration);
         return services;
     }
 

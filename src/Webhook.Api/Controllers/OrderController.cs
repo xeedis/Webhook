@@ -2,9 +2,11 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Webhook.Application.Commands;
+using Webhook.Application.Commands.CreatePaymentLink;
 using Webhook.Application.DTO;
 using Webhook.Infrastructure;
 
@@ -14,40 +16,20 @@ namespace Webhook.Api.Controllers;
 [Route("orders")]
 public class OrderController : ControllerBase
 {
-    private readonly AppOptions _options;
-
-    public OrderController(IOptionsSnapshot<AppOptions> options)
+    private readonly ISender _mediatR;
+    public OrderController(ISender mediatR)
     {
-        _options = options.Value;
+        _mediatR = mediatR;
     }
-    
     [HttpPost]
-    public async Task<ActionResult> CreateOrder(CreatePaymentCommand command)
+    public async Task<ActionResult> CreateOrder(CreatePaymentLinkCommand command)
     {
-        var client = new HttpClient();
-        var body = command with { ServiceId = _options.ServiceId };
-        
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.Token);
-        string _address = $"https://sandbox.api.imoje.pl/v1/merchant/{_options.MerchantId}/payment";
-
-        var options = new JsonSerializerOptions
+        var response = await _mediatR.Send(command);
+        if (string.IsNullOrEmpty(response))
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-        
-        var json = JsonSerializer.Serialize(body, options);
-        var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-        HttpResponseMessage response = await client.PostAsync(_address, data);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            return NotFound();
+            return BadRequest();
         }
 
-        var jsonString = await response.Content.ReadAsStringAsync();
-        var paymentResponse = JsonSerializer.Deserialize<PaymentResponseCommand>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-        return Ok(paymentResponse.Payment.Url);
+        return Ok(response);
     }
 }

@@ -18,10 +18,8 @@ Content-Type: application/json
   "returnUrl": "https://domain.com/return",
   "successReturnUrl": "https://domain.com/success",
   "failureReturnUrl": "https://domain.com/failure",
-  "customer": {
-    "firstName": "Jan",
-    "lastName": "Kowalski",
-    "email": "jan.kowalski@example.com"
-  }
+  "firstName": "Jan",
+  "lastName": "Kowalski",
+  "email": "jan.kowalski@example.com"
 }
 ###
